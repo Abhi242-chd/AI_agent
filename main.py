@@ -32,14 +32,14 @@ def main():
 
     messages = [ {
         "role": "user",
-        "content": args.user_prompt,
-    }
+        "content": args.user_prompt
+    },
 ]
     
     # generatea llm responce
     response = client.chat.completions.create(
             model = "openrouter/free",
-            messages = messages
+            messages = messages,
             )   
 
     if response.usage is None:
