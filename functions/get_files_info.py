@@ -1,14 +1,9 @@
 import os
-class Error(Exception):
-    pass
-
+from functions.error import PathTypeError
+from functions.validators import validate_path
 
 def get_files_info(working_directory: str, directory: str = ".") -> str:
-    abs_working_dir = os.path.abspath(working_directory)
-    target_dir = os.path.normpath(os.path.join(abs_working_dir, directory))
-    is_within_working_dir = os.path.commonpath([abs_working_dir, target_dir]) == abs_working_dir
-   
-
+    
     def format_directory_listing(entries: list) -> str:
         def line_format(filename: str) -> str:
             filepath = os.path.join(target_dir, filename)
@@ -18,12 +13,11 @@ def get_files_info(working_directory: str, directory: str = ".") -> str:
         
 
     try:
-        if not is_within_working_dir:
-            raise Error(f'Cannot list "{directory}" as it is outside the permitted working directory')
-        elif not os.path.isdir(target_dir):
-            raise Error('"{directory}" is not a directory')
+        target_dir = validate_path(working_directory, directory)
+        if not os.path.isdir(target_dir):
+            raise PathTypeError(f'"{directory}" is not a directory')
         elif os.path.isdir(target_dir):
             return format_directory_listing(os.listdir(target_dir))
-    except Error as e:
+    except Exception as e:
         return f'Error: {str(e)}'
     
