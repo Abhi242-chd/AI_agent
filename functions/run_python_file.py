@@ -1,7 +1,7 @@
 import os
 import subprocess
 from functions.validators import validate_path
-from functions.error import PathError, PathTypeError
+from functions.error import InvalidPathError, FileExecutionError, PathTypeError
 
 
 def run_python_file(
@@ -10,14 +10,11 @@ def run_python_file(
     try:
         absolute_file_path = validate_path(working_directory, file_path, "execute")
         
-    except Exception as e:
-        return f'Error: {str(e)}' 
-
-    try:
+        
         if os.path.isfile(absolute_file_path):
             
             if not absolute_file_path.endswith('.py'):
-                return f'Error: "{file_path}" is not a Python file'
+                raise PathTypeError(f'"{file_path}" is not a Python file')
 
 
             command = ["python", absolute_file_path]
@@ -46,8 +43,11 @@ def run_python_file(
             return '\n'.join(output)
 
         
-        return f'Error: "{file_path}" does not exist or is not a regular file'
+        raise FileExecutionError(f'"{file_path}" does not exist or is not a regular file')
 
+
+    except (InvalidPathError, PathTypeError, FileExecutionError) as e:
+        return f'Error: {str(e)}' 
 
     except Exception as e:
         return f'Error: executing Python file: {str(e)}'
