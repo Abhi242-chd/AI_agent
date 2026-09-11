@@ -1,7 +1,8 @@
 import os
 import argparse
-from dotenv import load_dotenv
 from openai import OpenAI
+from dotenv import load_dotenv
+from config import system_prompt
 from openai.types.chat import ChatCompletion
 
 
@@ -35,9 +36,13 @@ def main():
     args = parser.parse_args()
 
     messages = [ {
+        "role": "system", 
+        "content": system_prompt
+        }, 
+                {
         "role": "user",
         "content": args.user_prompt
-    },
+    },  
 ]
     
     response = generate_response(messages, client) 
@@ -50,6 +55,7 @@ def generate_response(messages: list[dict[str, str]], client: OpenAI) -> ChatCom
     response = client.chat.completions.create(
             model = "openrouter/free",
             messages = messages,
+            temperature=0,
             )   
 
     if response.usage is None:
