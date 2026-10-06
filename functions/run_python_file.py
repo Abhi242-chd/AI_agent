@@ -60,12 +60,13 @@ schema_run_python_file = {
         "parameters": {
             "type": "object",
             "properties": {
-                "file path": {
+                "file_path": {
                     "type": "string",
                     "description": "file path to execute was successfull or not from, relative to the working directory (default is the working directory itself)",
                 },
                 "arguments": {
-                    "type": "string",
+                    "type": "array",
+                    "items": {"type": "string"},
                     "description": "list of arguments to execute was successfull or not from, relative to the working directory (default is the working directory itself)"
                     }
             },

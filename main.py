@@ -1,11 +1,10 @@
 import os
-import json
 import argparse
 from openai import OpenAI
 from dotenv import load_dotenv
 from config import system_prompt
 from openai.types.chat import ChatCompletion
-from functions.call_function import available_functions, get_files_info, get_file_content, write_file, run_python_file
+from functions.call_function import available_functions, call_function
 
 
 
@@ -45,13 +44,13 @@ def main():
     },  
 ]
     
-    response = generate_response(messages, client) 
+    response = generate_response(messages, client, args.verbose) 
 
     result(messages, response, args.verbose)
     
 
 
-def generate_response(messages: list[dict[str, str]], client: OpenAI) -> ChatCompletion:
+def generate_response(messages: list[dict[str, str]], client: OpenAI, verbose: bool) -> ChatCompletion:
     response = client.chat.completions.create(
             model = "openrouter/free",
             messages = messages,
@@ -61,9 +60,12 @@ def generate_response(messages: list[dict[str, str]], client: OpenAI) -> ChatCom
     
     if message.tool_calls:
         for tool_call in message.tool_calls:
-            function_args = json.loads(tool_call.function.arguments or "{}")
-            print(f"Calling function: {tool_call.function.name}({function_args})")
-
+            result_message = call_function(tool_call, verbose)
+            if not result_message['content']:
+                raise Exception("missing content form funtion call")
+            if verbose:
+                print(f"-> {result_message['content']}")
+    
     if response.usage is None:
         raise RuntimeError('No response was generated')
     

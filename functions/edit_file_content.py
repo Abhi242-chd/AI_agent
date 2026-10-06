@@ -8,8 +8,7 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
         if os.path.isdir(target_file):
             raise PathTypeError(f'Cannot write to "{file_path}" as it is a directory')
         
-        os.makedirs(file_path, exist_ok=True)
-
+        os.makedirs(os.path.dirname(target_file), exist_ok=True)
         with open(target_file, 'w') as f:
             f.write(content)
             return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
@@ -27,7 +26,7 @@ schema_write_file = {
         "parameters": {
             "type": "object",
             "properties": {
-                "File path": {
+                "file_path": {
                     "type": "string",
                     "description": "File path to Write to file from, relative to the working directory (default is the working directory itself)",
                 },

@@ -4,6 +4,9 @@ class PathError(Exception):
 class FileExecutionError(Exception):
     pass
 
+class MissingValueError(Exception):
+    pass
+
 class InvalidPathError(PathError):
     pass
 

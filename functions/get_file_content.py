@@ -31,7 +31,7 @@ schema_get_file_content = {
         "parameters": {
             "type": "object",
             "properties": {
-                "File path": {
+                "file_path": {
                     "type": "string",
                     "description": "File path to read file contents from, relative to the working directory (default is the working directory itself)",
                 },
