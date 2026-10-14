@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -43,32 +44,41 @@ def main():
         "content": args.user_prompt
     },  
 ]
-    
     response = generate_response(messages, client, args.verbose) 
-
+    
     result(messages, response, args.verbose)
     
 
 
 def generate_response(messages: list[dict[str, str]], client: OpenAI, verbose: bool) -> ChatCompletion:
-    response = client.chat.completions.create(
-            model = "openrouter/free",
-            messages = messages,
-            tools=available_functions,
-            ) 
-    message = response.choices[0].message
-    
+    for _ in range(20):
+        response = client.chat.completions.create(
+                model = "openrouter/free",
+                messages = messages,
+                tools=available_functions,
+                ) 
+        
+        message = response.choices[0].message
+        messages.append(message)
+        
+        if message.tool_calls:
+            for tool_call in message.tool_calls:
+                result_message = call_function(tool_call, verbose) 
+                if not result_message['content']:
+                    raise Exception("missing content form funtion call")
+                messages.append(result_message)
+
+                if verbose:
+                    print(f"-> {result_message['content']}")
+        else:
+            break
+        
+        if response.usage is None:
+            raise RuntimeError('No response was generated')
+        
     if message.tool_calls:
-        for tool_call in message.tool_calls:
-            result_message = call_function(tool_call, verbose)
-            if not result_message['content']:
-                raise Exception("missing content form funtion call")
-            if verbose:
-                print(f"-> {result_message['content']}")
-    
-    if response.usage is None:
-        raise RuntimeError('No response was generated')
-    
+        sys.exit(f'Error: {message} call return{result_message["content"]}')
+
     return response
 
 
