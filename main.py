@@ -2,8 +2,9 @@ import os
 import sys
 import argparse
 from openai import OpenAI
+from config import MAX_ITERS
 from dotenv import load_dotenv
-from config import system_prompt
+from prompt import system_prompt
 from openai.types.chat import ChatCompletion
 from functions.call_function import available_functions, call_function
 
@@ -51,7 +52,7 @@ def main():
 
 
 def generate_response(messages: list[dict[str, str]], client: OpenAI, verbose: bool) -> ChatCompletion:
-    for _ in range(20):
+    for _ in range(MAX_ITERS):
         response = client.chat.completions.create(
                 model = "openrouter/free",
                 messages = messages,
