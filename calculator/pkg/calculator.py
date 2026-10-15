@@ -18,11 +18,40 @@ class Calculator:
             "/": 2,
         }
 
+    def factorial(self, n: float) -> float:
+        #Calculate the factorial of a non-negative number.
+        if n < 0:
+            raise ValueError("Factorial is not defined for negative numbers")
+        if n == 0 or n == 1:
+            return 1.0
+        result = 1.0
+        for i in range(2, int(n) + 1):
+            result *= i
+        return result
+
     def evaluate(self, expression: str) -> float | None:
         if not expression or expression.isspace():
             return None
+        
+        # First pass: handle factorial operations (e.g., "5!" -> apply factorial to 5)
         tokens = expression.strip().split()
-        return self._evaluate_infix(tokens)
+        processed_tokens = []
+        
+        for token in tokens:
+            if token.endswith("!"):
+                # Extract the number part
+                number_str = token[:-1]
+                try:
+                    number = float(number_str)
+                    # Apply factorial
+                    fact_result = self.factorial(number)
+                    processed_tokens.append(str(fact_result))
+                except ValueError:
+                    raise ValueError(f"Invalid number in factorial expression: {number_str}")
+            else:
+                processed_tokens.append(token)
+        
+        return self._evaluate_infix(processed_tokens)
 
     def _evaluate_infix(self, tokens: list[str]) -> float:
         values: list[float] = []

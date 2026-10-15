@@ -44,6 +44,35 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.calculator.evaluate("+ 3")
 
+    # New factorial tests
+    def test_factorial_zero(self) -> None:
+        result = self.calculator.evaluate("0!")
+        self.assertEqual(result, 1)
+
+    def test_factorial_one(self) -> None:
+        result = self.calculator.evaluate("1!")
+        self.assertEqual(result, 1)
+
+    def test_factorial_five(self) -> None:
+        result = self.calculator.evaluate("5!")
+        self.assertEqual(result, 120)
+
+    def test_factorial_with_other_operations(self) -> None:
+        result = self.calculator.evaluate("3! + 4")
+        self.assertEqual(result, 10)  # 3! = 6, 6 + 4 = 10
+
+    def test_factorial_multiplication(self) -> None:
+        result = self.calculator.evaluate("3 * 4!")
+        self.assertEqual(result, 72)  # 4! = 24, 3 * 24 = 72
+
+    def test_factorial_negative(self) -> None:
+        with self.assertRaises(ValueError):
+            self.calculator.evaluate("-5!")
+
+    def test_factorial_invalid_token(self) -> None:
+        with self.assertRaises(ValueError):
+            self.calculator.evaluate("abc!")
+
 
 if __name__ == "__main__":
     unittest.main()
